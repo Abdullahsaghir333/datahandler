@@ -148,15 +148,18 @@
       // Replace with your actual Google Apps Script URL
       const scriptURL = 'https://script.google.com/macros/s/AKfycbysWLADg2ZSK5NC75A40nhkePw_R4gr_TZ1XWf2suQ_YrOf6myGlQhCyRUzJsJgjOoAcw/exec';
       
-      // Using form data approach which works better with Google Apps Script
-      const formData = new FormData();
+      // Create URL-encoded string for form data (works better with Apps Script)
+      const urlEncodedData = Object.keys(userData)
+        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(userData[key]))
+        .join('&');
       
-      // Add all user data to form data
-      Object.keys(userData).forEach(key => {
-        formData.append(key, userData[key]);
-      });
-      
-      fetch(scriptURL, { method: 'POST', body: formData })
+      fetch(scriptURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: urlEncodedData
+      })
         .then(response => {
           document.getElementById('loading').style.display = 'none';
           if (response.ok) {
