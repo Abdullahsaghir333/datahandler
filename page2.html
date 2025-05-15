@@ -104,10 +104,11 @@
   userData.subject = document.getElementById('subject').value;
   userData.language = document.getElementById('language').value;
 
-  console.log("Data being sent:", userData); // Debug
+  console.log("Data being sent:", JSON.stringify(userData, null, 2)); // Debug
 
   fetch('https://script.google.com/macros/s/AKfycbxCF0iZ6emhuZxSdVvXhDrMVQeNLVBGI6xD7xbMNGjkxtm7QLA-kV7BpqQEve0E9iQu/exec', {
     method: 'POST',
+    mode: 'cors', // Explicitly enable CORS
     body: JSON.stringify(userData),
     headers: {
       'Content-Type': 'application/json'
@@ -119,10 +120,12 @@
   })
   .then(response => {
     console.log("Response text:", response); // Debug
+    alert("Data submitted successfully!");
     localStorage.removeItem("userData");
   })
   .catch(error => {
     console.error("Fetch error:", error); // Debug
+    alert("Error submitting data.");
   });
 }
   </script>
