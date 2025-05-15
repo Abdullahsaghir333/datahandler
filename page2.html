@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page 2 - Academic Information</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 400px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      width: 48%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      color: white;
+    }
+    .prev-btn {
+      background-color: #777;
+    }
+    .prev-btn:hover {
+      background-color: #666;
+    }
+    .submit-btn {
+      background-color: #4CAF50;
+    }
+    .submit-btn:hover {
+      background-color: #45a049;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Academic Information</h2>
+    <form id="form2" onsubmit="submitForm(event)">
+      <label>Subjects:
+        <select id="subject" required>
+          <option value="">Select Subject</option>
+          <option value="Math">Math</option>
+          <option value="Science">Science</option>
+          <option value="English">English</option>
+        </select>
+      </label>
+
+      <label>Language Medium:
+        <select id="language" required>
+          <option value="">Select Language</option>
+          <option value="English">English</option>
+          <option value="Urdu">Urdu</option>
+        </select>
+      </label>
+
+      <div class="btn-group">
+        <button type="button" class="prev-btn" onclick="goBack()">Previous</button>
+        <button type="submit" class="submit-btn">Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function goBack() {
+      window.location.href = "page1.html";
+    }
+
+    function submitForm(event) {
+      event.preventDefault();
+      const userData = JSON.parse(localStorage.getItem("userData")) || {};
+      userData.subject = document.getElementById('subject').value;
+      userData.language = document.getElementById('language').value;
+
+      fetch('https://script.google.com/macros/s/AKfycbwgAOpFZ2lnybcEeN_h4zAHm4oyUMHgi1qSukHuHQZzhSF7M5D59OQz0HfNgr1fj_DY/exec', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.text())
+      .then(response => {
+        alert("Data submitted successfully!");
+        localStorage.removeItem("userData");
+      })
+      .catch(error => {
+        alert("Error submitting data.");
+        console.error(error);
+      });
+    }
+  </script>
+</body>
+</html>
