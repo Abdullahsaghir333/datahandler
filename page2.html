@@ -11,6 +11,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
     .form-container {
       background-color: white;
@@ -108,7 +109,7 @@
         <button type="button" class="prev-btn" onclick="goBack()">Previous</button>
         <button type="button" class="submit-btn" onclick="submitForm()">Submit</button>
       </div>
-      
+
       <div class="loading" id="loading">Submitting data, please wait...</div>
       <div class="success-message" id="success-message">Form submitted successfully!</div>
       <div class="error-message" id="error-message">Error submitting form. Please try again.</div>
@@ -120,39 +121,47 @@
     window.onload = function() {
       if (!localStorage.getItem("userData")) {
         alert("Please fill out the first page before continuing.");
-        window.location.href = "page1.html";
+        navigateToPage1();
       }
     };
-  
-    function goBack() {
+
+    function navigateToPage1() {
+      // Clear any existing user data
+      localStorage.removeItem("userData");
+      // Navigate to page1
       window.location.href = "page1.html";
     }
-    
+
+    function goBack() {
+      // Keep the data and just navigate back
+      window.location.href = "page1.html";
+    }
+
     function submitForm() {
       const subject = document.getElementById('subject').value;
       const language = document.getElementById('language').value;
-      
+
       if (!subject || !language) {
         alert("Please select both subject and language");
         return;
       }
-      
+
       // Get the user data from localStorage
       const userData = JSON.parse(localStorage.getItem("userData")) || {};
       userData.subject = subject;
       userData.language = language;
-      
+
       // Show loading message
       document.getElementById('loading').style.display = 'block';
-      
+
       // Replace with your actual Google Apps Script URL
       const scriptURL = 'https://script.google.com/macros/s/AKfycbysWLADg2ZSK5NC75A40nhkePw_R4gr_TZ1XWf2suQ_YrOf6myGlQhCyRUzJsJgjOoAcw/exec';
-      
+
       // Create URL-encoded string for form data (works better with Apps Script)
       const urlEncodedData = Object.keys(userData)
         .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(userData[key]))
         .join('&');
-      
+
       fetch(scriptURL, {
         method: 'POST',
         headers: {
@@ -164,11 +173,10 @@
           document.getElementById('loading').style.display = 'none';
           if (response.ok) {
             document.getElementById('success-message').style.display = 'block';
-            localStorage.removeItem("userData");
-            // Redirect to page1 after successful submission
+            // Clear data and navigate with shorter delay
             setTimeout(() => {
-              window.location.href = "page1.html";
-            }, 3000);
+              navigateToPage1();
+            }, 1500); // Reduced from 3000ms to 1500ms
           } else {
             document.getElementById('error-message').style.display = 'block';
             setTimeout(() => {
