@@ -119,12 +119,10 @@
   })
   .then(response => {
     console.log("Response text:", response); // Debug
-    alert("Data submitted successfully!");
     localStorage.removeItem("userData");
   })
   .catch(error => {
     console.error("Fetch error:", error); // Debug
-    alert("Error submitting data.");
   });
 }
   </script>
