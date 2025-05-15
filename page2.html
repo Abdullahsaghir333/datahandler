@@ -117,7 +117,6 @@
   </div>
 
   <script>
-    // Check if user data exists in localStorage when page loads
     window.onload = function() {
       if (!localStorage.getItem("userData")) {
         alert("Please fill out the first page before continuing.");
@@ -126,14 +125,11 @@
     };
 
     function navigateToPage1() {
-      // Clear any existing user data
       localStorage.removeItem("userData");
-      // Navigate to page1
       window.location.href = "page1.html";
     }
 
     function goBack() {
-      // Keep the data and just navigate back
       window.location.href = "page1.html";
     }
 
@@ -146,23 +142,25 @@
         return;
       }
 
-      // Get the user data from localStorage
       const userData = JSON.parse(localStorage.getItem("userData")) || {};
       userData.subject = subject;
       userData.language = language;
 
-      // Show loading message
       document.getElementById('loading').style.display = 'block';
 
-      // Replace with your actual Google Apps Script URL
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbysWLADg2ZSK5NC75A40nhkePw_R4gr_TZ1XWf2suQ_YrOf6myGlQhCyRUzJsJgjOoAcw/exec';
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbwuMOAPal8EihDSf1qSWgwgB709waN9tuBYgWPN4IJBLI4DAZM4JZ_alTPEiYjnuwbVUw/exec';
+      
+      // Use a CORS proxy to bypass the OPTIONS 405 issue (temporary for testing)
+      const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+      const fetchURL = corsProxy + scriptURL;
 
-      // Create URL-encoded string for form data (works better with Apps Script)
       const urlEncodedData = Object.keys(userData)
         .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(userData[key]))
         .join('&');
 
-      fetch(scriptURL, {
+      console.log("Data being sent:", urlEncodedData); // Debug
+
+      fetch(fetchURL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -170,22 +168,23 @@
         body: urlEncodedData
       })
         .then(response => {
+          console.log('Response status:', response.status); // Debug
           document.getElementById('loading').style.display = 'none';
-          if (response.ok) {
+          return response.text().then(text => ({ status: response.status, text }));
+        })
+        .then(({ status, text }) => {
+          console.log('Response text:', text); // Debug
+          if (status >= 200 && status < 300) {
             document.getElementById('success-message').style.display = 'block';
-            // Clear data and navigate with shorter delay
             setTimeout(() => {
               navigateToPage1();
-            }, 1500); // Reduced from 3000ms to 1500ms
+            }, 1500);
           } else {
-            document.getElementById('error-message').style.display = 'block';
-            setTimeout(() => {
-              document.getElementById('error-message').style.display = 'none';
-            }, 3000);
+            throw new Error(`HTTP error! Status: ${status}, Response: ${text}`);
           }
         })
         .catch(error => {
-          console.error('Error:', error);
+          console.error('Fetch error:', error);
           document.getElementById('loading').style.display = 'none';
           document.getElementById('error-message').style.display = 'block';
           setTimeout(() => {
